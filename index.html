@@ -591,7 +591,7 @@
         let roomLoadChart = null;
         let teacherDistributionChart = null;
 
-        // ===== DRAG-DROP STATE =====
+        //DRAG-DROP STATE 
         let dragState = {
             sourceDay: null,
             sourceIndex: null,
@@ -759,10 +759,9 @@
                 document.getElementById('optimizationCard').classList.add('hidden');
             });
         }
-
-        // =========================================================
-        // ✅ СОХРАНЕНИЕ ИЗМЕНЕНИЙ НА СЕРВЕР
-        // =========================================================
+        
+        //СОХРАНЕНИЕ ИЗМЕНЕНИЙ НА СЕРВЕР
+        
         function saveEditorChanges() {
             if (!appState.schedule) {
                 alert("Сначала сгенерируйте расписание!");
@@ -791,9 +790,7 @@
             });
         }
 
-        // =========================================================
-        // ✅ DRAG AND DROP & CONFLICT VALIDATION
-        // =========================================================
+        // DRAG AND DROP & ПРОВЕРКА НА КОНФЛИКТЫ
 
         function renumberDay(lessonsArray) {
             if (!Array.isArray(lessonsArray)) return;
@@ -885,7 +882,7 @@
             setTimeout(validateConflicts, 100);
         }
 
-        // --- УЛУЧШЕННАЯ ПРОВЕРКА КОНФЛИКТОВ С ТЕКСТОМ И ТИПАМИ ---
+        //УЛУЧШЕННАЯ ПРОВЕРКА КОНФЛИКТОВ С ТЕКСТОМ И ТИПАМИ
         function validateConflicts() {
             document.querySelectorAll('.lesson-card').forEach(c => {
                 c.classList.remove('conflict-teacher', 'conflict-room');
@@ -959,7 +956,6 @@
                     const tooltip = card.querySelector('.conflict-tooltip');
                     if (tooltip) {
                         tooltip.textContent = tooltipText.join('; ');
-                        // display:block управляется CSS через классы
                     }
                 }
             });
@@ -1081,9 +1077,7 @@
             displaySchedule();
         }
 
-        // =========================================================
         // ЭКСПОРТ
-        // =========================================================
 
         function exportExcel() {
             fetch('http://localhost:5000/api/export/xlsx')
@@ -1201,9 +1195,8 @@
             XLSX.writeFile(wb, 'template_' + new Date().toISOString().split('T')[0] + '.xlsx');
         }
 
-        // =========================================================
-        // АНАЛИТИКА (ОБНОВЛЕННАЯ ПОД ЗАВУЧА)
-        // =========================================================
+        // АНАЛИТИКА
+        
         function updateAnalytics() {
             const msg = document.getElementById('analyticsMessage');
             msg.innerHTML = '';
@@ -1216,7 +1209,7 @@
             const daysOrder = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница'];
             const allClasses = Object.keys(appState.schedule);
 
-            // 1. ПОДСЧЕТ ОКОН УЧИТЕЛЕЙ (Gap Analysis)
+            // 1. ПОДСЧЕТ ОКОН УЧИТЕЛЕЙ 
             const teacherSchedules = {};
             const teacherWindows = {};
 
@@ -1258,7 +1251,7 @@
             // Сортировка учителей по окнам
             windowsByTeacher.sort((a, b) => b.count - a.count);
 
-            // 2. ЗАГРУЗКА КАБИНЕТОВ (Room Utilization)
+            // 2. ЗАГРУЗКА КАБИНЕТОВ
             const roomUsage = {};
             allClasses.forEach(cls => {
                 const sched = appState.schedule[cls];
