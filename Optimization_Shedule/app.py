@@ -25,7 +25,7 @@ last_conflicts = None
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# ==================== ЭКСПОРТ В EXCEL ====================
+#ЭКСПОРТ В EXCEL 
 
 def export_to_excel(schedule, fitness, conflicts):
 	"""Экспортировать расписание в XLSX файл с 4 листами"""
@@ -42,7 +42,7 @@ def export_to_excel(schedule, fitness, conflicts):
 	alt_fill = PatternFill(start_color="F0F0F0", end_color="F0F0F0", fill_type="solid")
 	days = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница']
 
-	# ===== ЛИСТ 0: ОТЧЕТ ГЕНЕРАЦИИ =====
+	# ЛИСТ 0: ОТЧЕТ ГЕНЕРАЦИИ 
 	def create_report_sheet(wb, schedule, fitness, conflicts):
 		ws = wb.create_sheet("Отчет генерации", 0)
 		ws['A1'] = "ОТЧЕТ ОБ ОПТИМИЗАЦИИ РАСПИСАНИЯ"
@@ -105,7 +105,7 @@ def export_to_excel(schedule, fitness, conflicts):
 		for r in range(3, row):
 			ws.row_dimensions[r].height = 20
 
-	# ===== ЛИСТ 1: РАСПИСАНИЕ КЛАССОВ =====
+	# ЛИСТ 1: РАСПИСАНИЕ КЛАССОВ 
 	def create_classes_sheet(wb, schedule, days):
 		ws = wb.create_sheet("Расписание классов", 1)
 		row = 1
@@ -179,7 +179,7 @@ def export_to_excel(schedule, fitness, conflicts):
 		for col in range(2, 9):
 			ws.column_dimensions[get_column_letter(col)].width = 18
 
-	# ===== ЛИСТ 2: РАСПИСАНИЕ УЧИТЕЛЕЙ =====
+	# ЛИСТ 2: РАСПИСАНИЕ УЧИТЕЛЕЙ
 	def create_teachers_sheet(wb, schedule, days):
 		ws = wb.create_sheet("Расписание учителей", 2)
 		teachers_set = set()
@@ -288,7 +288,7 @@ def export_to_excel(schedule, fitness, conflicts):
 		for col in range(2, 9):
 			ws.column_dimensions[get_column_letter(col)].width = 18
 
-	# ===== ЛИСТ 3: ЗАГРУЖЕННОСТЬ КАБИНЕТОВ =====
+	# ЛИСТ 3: ЗАГРУЖЕННОСТЬ КАБИНЕТОВ
 	def create_rooms_sheet(wb, schedule, days):
 		ws = wb.create_sheet("Загруженность кабинетов", 3)
 		ws['A1'] = "ЗАГРУЖЕННОСТЬ КАБИНЕТОВ"
@@ -436,7 +436,7 @@ def export_to_excel(schedule, fitness, conflicts):
 	create_rooms_sheet(wb, schedule, days)
 	return wb
 
-# ==================== ЭКСПОРТ В PDF ====================
+# ЭКСПОРТ В PDF 
 
 def export_to_pdf(schedule, fitness, conflicts):
     """Экспортировать расписание в PDF"""
@@ -566,7 +566,7 @@ def export_to_pdf(schedule, fitness, conflicts):
     doc.build(story)
     buffer.seek(0)
     return buffer
-# ==================== ROUTES ====================
+# ROUTES
 
 @app.route('/')
 def serve_index():
@@ -712,11 +712,11 @@ def health():
 
 if __name__ == '__main__':
 	print("=" * 60)
-	print("🚀 Schedule Optimizer API v6.0 запущен!")
+	print("Schedule Optimizer API v6.0 запущен!")
 	print("=" * 60)
-	print("📍 URL: http://localhost:5000")
-	print("📊 API: http://localhost:5000/api/optimize")
-	print("📥 Экспорт:")
+	print("URL: http://localhost:5000")
+	print("API: http://localhost:5000/api/optimize")
+	print("Экспорт:")
 	print(" - XLSX: /api/export/xlsx")
 	print(" - PDF: /api/export/pdf")
 	print(" - JSON: /api/export/json")
