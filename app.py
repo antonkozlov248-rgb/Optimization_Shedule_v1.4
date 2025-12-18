@@ -711,11 +711,11 @@ def health():
 
 if __name__ == '__main__':
 	print("=" * 60)
-	print("🚀 Schedule Optimizer API v6.0 запущен!")
+	print("Schedule Optimizer API v6.0 запущен!")
 	print("=" * 60)
-	print("📍 URL: http://localhost:5000")
-	print("📊 API: http://localhost:5000/api/optimize")
-	print("📥 Экспорт:")
+	print("URL: http://localhost:5000")
+	print("API: http://localhost:5000/api/optimize")
+	print("Экспорт:")
 	print(" - XLSX: /api/export/xlsx")
 	print(" - PDF: /api/export/pdf")
 	print(" - JSON: /api/export/json")
