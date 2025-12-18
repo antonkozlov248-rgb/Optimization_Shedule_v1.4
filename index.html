@@ -695,7 +695,7 @@
                 subjects: appState.uploadedData.subjects,
                 teachers: appState.uploadedData.teachers,
                 rooms: appState.uploadedData.rooms,
-                generations: 500, // Вернули 500 поколений как просили
+                generations: 500,
                 population_size: 40,
                 mutation_rate: 0.2
             };
@@ -709,7 +709,7 @@
                 document.getElementById('progressBar').style.width = (generation / maxGenerations * 100) + '%';
             }, 900);
 
-            fetch('http://localhost:5000/api/optimize', {
+            fetch(window.location.origin + '/api/optimize', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(requestData)
@@ -760,8 +760,6 @@
             });
         }
         
-        //СОХРАНЕНИЕ ИЗМЕНЕНИЙ НА СЕРВЕР
-        
         function saveEditorChanges() {
             if (!appState.schedule) {
                 alert("Сначала сгенерируйте расписание!");
@@ -771,7 +769,7 @@
             const status = document.getElementById('saveStatus');
             status.innerHTML = '<span style="color: blue">⏳ Сохранение...</span>';
 
-            fetch('http://localhost:5000/api/update', {
+            fetch(window.location.origin + '/api/update', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ schedule: appState.schedule })
@@ -789,8 +787,6 @@
                 status.innerHTML = '<span style="color: red">❌ Ошибка сети</span>';
             });
         }
-
-        // DRAG AND DROP & ПРОВЕРКА НА КОНФЛИКТЫ
 
         function renumberDay(lessonsArray) {
             if (!Array.isArray(lessonsArray)) return;
@@ -882,7 +878,6 @@
             setTimeout(validateConflicts, 100);
         }
 
-        //УЛУЧШЕННАЯ ПРОВЕРКА КОНФЛИКТОВ С ТЕКСТОМ И ТИПАМИ
         function validateConflicts() {
             document.querySelectorAll('.lesson-card').forEach(c => {
                 c.classList.remove('conflict-teacher', 'conflict-room');
@@ -897,7 +892,7 @@
             const allCards = document.querySelectorAll('.lesson-card');
 
             const teacherOccupied = {};
-            const roomOccupied = {}; // Для желтых конфликтов
+            const roomOccupied = {};
             const daysOrder = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница'];
 
             if (appState.schedule) {
@@ -914,13 +909,11 @@
                                  if (lessonNum >= 0) {
                                      const key = `${day}_${lessonNum}`;
 
-                                     // Учителя
                                      if(l.учитель) {
                                          if (!teacherOccupied[key]) teacherOccupied[key] = {};
                                          teacherOccupied[key][l.учитель] = clsName;
                                      }
 
-                                     // Кабинеты
                                      if(l.кабинет) {
                                          if (!roomOccupied[key]) roomOccupied[key] = {};
                                          roomOccupied[key][l.кабинет] = clsName;
@@ -940,13 +933,11 @@
                 const key = `${day}_${index}`;
                 let tooltipText = [];
 
-                // 1. Проверка учителей (КРАСНЫЙ)
                 if (teacher && teacherOccupied[key] && teacherOccupied[key][teacher]) {
                     card.classList.add('conflict-teacher');
                     tooltipText.push(`❌ В классе ${teacherOccupied[key][teacher]}`);
                 }
 
-                // 2. Проверка кабинетов (ОРАНЖЕВЫЙ)
                 if (room && roomOccupied[key] && roomOccupied[key][room]) {
                     card.classList.add('conflict-room');
                     tooltipText.push(`⚠️ Каб. в классе ${roomOccupied[key][room]}`);
@@ -960,7 +951,6 @@
                 }
             });
         }
-
 
         function attachDragDropHandlers() {
             document.querySelectorAll('.lesson-card').forEach(card => {
@@ -1077,10 +1067,8 @@
             displaySchedule();
         }
 
-        // ЭКСПОРТ
-
         function exportExcel() {
-            fetch('http://localhost:5000/api/export/xlsx')
+            fetch(window.location.origin + '/api/export/xlsx')
                 .then(response => {
                     if (!response.ok) throw new Error('Ошибка сервера');
                     return response.blob();
@@ -1101,7 +1089,7 @@
         }
 
         function exportPDF() {
-            fetch('http://localhost:5000/api/export/pdf')
+            fetch(window.location.origin + '/api/export/pdf')
                 .then(response => {
                     if (!response.ok) throw new Error('Ошибка сервера');
                     return response.blob();
@@ -1122,7 +1110,7 @@
         }
 
         function exportJSON() {
-            fetch('http://localhost:5000/api/export/json')
+            fetch(window.location.origin + '/api/export/json')
                 .then(response => {
                     if (!response.ok) throw new Error('Ошибка сервера');
                     return response.blob();
@@ -1195,8 +1183,6 @@
             XLSX.writeFile(wb, 'template_' + new Date().toISOString().split('T')[0] + '.xlsx');
         }
 
-        // АНАЛИТИКА
-        
         function updateAnalytics() {
             const msg = document.getElementById('analyticsMessage');
             msg.innerHTML = '';
@@ -1209,7 +1195,6 @@
             const daysOrder = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница'];
             const allClasses = Object.keys(appState.schedule);
 
-            // 1. ПОДСЧЕТ ОКОН УЧИТЕЛЕЙ 
             const teacherSchedules = {};
             const teacherWindows = {};
 
@@ -1248,10 +1233,8 @@
                 }
             });
 
-            // Сортировка учителей по окнам
             windowsByTeacher.sort((a, b) => b.count - a.count);
 
-            // 2. ЗАГРУЗКА КАБИНЕТОВ
             const roomUsage = {};
             allClasses.forEach(cls => {
                 const sched = appState.schedule[cls];
@@ -1267,9 +1250,8 @@
 
             const sortedRooms = Object.entries(roomUsage)
                 .sort((a,b) => b[1] - a[1])
-                .slice(0, 7); // Топ 7
+                .slice(0, 7);
 
-            // 3. КОНФЛИКТЫ (Реальные данные из appState.optimizationResults если есть, иначе считаем)
             let conflictTeachers = 0;
             let conflictRooms = 0;
 
@@ -1278,19 +1260,16 @@
                 conflictRooms = appState.optimizationResults.conflicts.room_conflicts || 0;
             }
 
-            // ОБНОВЛЕНИЕ СВОДНЫХ КАРТОЧЕК
             document.getElementById('statTeacherConflicts').textContent = conflictTeachers;
             document.getElementById('statRoomConflicts').textContent = conflictRooms;
             document.getElementById('statTeacherWindows').textContent = totalWindows;
 
-             // Fitness
             if (appState.optimizationResults && typeof appState.optimizationResults.fitness !== 'undefined') {
                 document.getElementById('statFitness').textContent = Math.round(appState.optimizationResults.fitness) + '%';
             } else {
                 document.getElementById('statFitness').textContent = document.getElementById('fitnessScore')?.textContent || '0%';
             }
 
-            // СПИСОК "ОКОН"
             const windowsListEl = document.getElementById('teachersWindowsList');
             windowsListEl.innerHTML = '';
             if (windowsByTeacher.length === 0) {
@@ -1304,14 +1283,12 @@
                 });
             }
 
-            // ГРАФИКИ
             const roomCtx = document.getElementById('roomLoadChart').getContext('2d');
             const teacherDistCtx = document.getElementById('teacherDistributionChart').getContext('2d');
 
             if (roomLoadChart) roomLoadChart.destroy();
             if (teacherDistributionChart) teacherDistributionChart.destroy();
 
-            // 1. График кабинетов (Горизонтальный бар)
             roomLoadChart = new Chart(roomCtx, {
                 type: 'bar',
                 data: {
@@ -1331,8 +1308,6 @@
                 }
             });
 
-            // 2. График распределения учителей (Pie Chart: Норма / Перегруз / Недогруз)
-            // Условно: Норма 18-24 часа, Недогруз <18, Перегруз >24 (примерно)
             let normalLoad = 0;
             let heavyLoad = 0;
             let lightLoad = 0;
